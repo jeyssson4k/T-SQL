@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-sparkline.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-table.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+    <link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+    <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
+
+    <title>| Dashboard |</title>
+    <style>
+        *{
+            box-sizing: border-box;object-fit: cover;
+            list-style: none;text-decoration: none;
+            margin: 0;padding: 0;font-family: "Lato";
+        }
+        :root{
+            --main-blue: #0575E6;
+            --main-dark-blue: #021B79;
+            --main-background: #cad1fa50;
+        }
+
+        h1{font-weight: 700;}
+        h2{font-weight: 900;}
+        h3{font-weight: 400;}
+        body{background-color: #fff ; width: 100%; height: 100%;}
+
+        .content-shadow{
+            border: 1px solid #50505000;
+            border-radius: 12px;
+            box-shadow: 4px 4px 8px 6px #50505010;
+        }
+        .content-row{
+            display: flex;flex-direction: row;
+            flex-wrap: wrap;justify-content: space-around;
+        }
+        .content-column{
+            display: flex;flex-direction: column;
+            flex-wrap: wrap;justify-content: left;
+        }
+        .content-fill{
+            background: #ffffff;
+        }
+        .interactive-content{
+            transition: 0.2s all ease-out;
+        }
+        .interactive-content:hover{
+            scale: 1.25;
+            transition: 0.2s all ease-in;
+        }
+        .main-title{
+            line-height: 40px;
+            background: linear-gradient(
+                -45deg, 
+                var(--main-dark-blue), 
+                var(--main-blue));
+            margin-bottom: 32px;
+            padding: 16px;
+            color: #fff;
+        }
+
+        .stats-section, .graph-section, .info-section{
+            width: 85%;max-width: 1080px;
+            margin: auto;margin-top: 96px;
+        }
+        .stats-section h2{
+            margin-bottom: 16px;
+        }
+        .stats-section .stats-container .stats-element{
+            width: 20%;
+            min-width: 200px;
+            margin: 20px;
+            line-height: 48px;
+        }
+
+        .stats-section .stats-container .stats-element h3{
+            padding: 16px;
+            font-size: 14px;
+        }
+        .stats-section .stats-container .stats-element span{
+            font-weight: 900;
+            font-size: 40px;
+            padding: 32px;
+            color: var(--main-blue);
+        }
+        .graph-section .graph-content{
+            margin: 32px 28px 0 32px;
+            padding: 32px;
+            overflow-x: hidden;
+        }
+        .graph-section .graph-content h3{
+            margin: 0 0 16px 0;
+            font-style: italic;
+        }
+
+        .graph-section .graph-content .graph .chart-info{
+            margin-left: 96px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+
+        }
+        .graph-section .graph-content .graph .chart-info .chart-element{
+            display: flex;
+            flex-direction: row;
+        }
+        .graph-section .graph-content .graph .chart-info .chart-element .box{
+            width: 20px;
+            height: 20px;
+            background-color: var(--e-color);
+            margin-right: 12px;
+        }
+        .chart-wrap{
+            --chart-width: 300px;--grid-color: #aaa;
+            --bar-thickness: 40px;
+            --bar-rounded: 3px;
+            --bar-spacing: 10px;
+            font-family: sans-serif;
+            width: var(--chart-width);
+        }
+        .chart-wrap.horizontal .grid{
+            transform: rotate(-90deg);
+        }
+        .chart-wrap.horizontal .bar::after{
+            transform: rotate(45deg);
+            padding-top: 0;
+            display: block;
+        }
+        .chart-wrap .grid{
+            margin-left: 50px;
+            position: relative;
+            padding: 5px 0 5px 0;
+            height: 100%;
+            width: 100%;
+            border-left: 2px solid var(--grid-color);
+        }
+        .chart-wrap .grid::before{
+            font-size: 0.8em;
+            font-weight: bold;
+            content: "0%";
+            position: absolute;
+            left: -0.5em;
+            top: -1.5em;
+        }
+        .chart-wrap .grid::after{
+            font-size: 0.8em;
+            font-weight: bold;
+            content: "100%";
+            position: absolute;
+            right: -1.5em;
+            top:-1.5em;
+        }
+        .chart-wrap.horizontal .grid::before, .chart-wrap.horizontal .grid::after{
+            transform: rotate(90deg);
+        }
+        .chart-wrap .bar{
+            width: var(--bar-value);
+            height: var(--bar-thickness);
+            margin: var(--bar-spacing);
+            background-color: var(--bar-color);
+            border-radius: 0 var(--bar-rounded) var(--bar-rounded) 0;
+        }
+        .chart-wrap .bar:hover{
+            opacity: 0.7;
+        }
+        .chart-wrap .bar::after{
+            content: attr(data-name);
+            margin-left: 100%;
+            padding: 10px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .groups-info{
+            width: 90%;
+            margin: auto;
+        }
+        .group-element{
+            padding: 32px;
+            margin: 16px 12px;
+            width: 250px;
+            overflow-wrap: break-word;
+        }
+        .group-element span{
+            margin-bottom: 8px;
+        }
+        .anychart-credits{
+            display: none;
+        }
+        #container{
+            box-shadow: 4px 4px 8px 6px #50505010;
+        }
+        footer{
+            margin-top: 32px;
+            line-height: 40px;
+
+        }
+        footer span{
+            padding: 32px;
+        }
+        @media screen and (max-width: 900px) {
+            .graph-section{
+                display: flex;
+                flex-direction: column;
+                margin: auto;
+                align-items: center;
+                justify-content: center;
+            }
+            .chart-wrap .grid{margin: 0;}
+        }
+        @media screen and (max-width: 600px) {
+            .graph-section{width: 100%;}
+            .grid{scale: 0.7;}
+        }
+    </style>
+</head>
+<body oncontextmenu="return false">
+    <header class="main-title">
+        <h1>Reporte</h1>
+    </header>
+    <main>
+        <section class="stats-section">
+            <h2>Estadísticas generales</h2>
+            <section class="stats-container content-row">
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Consultas</h3>
+                    <span>16.7K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Activos</h3>
+                    <span>16.7K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Peticiones</h3>
+                    <span>9.02K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Revisiones</h3>
+                    <span>1K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Usuarios</h3>
+                    <span>0.27K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Consultas</h3>
+                    <span>6.7K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Consultas</h3>
+                    <span>16.7K</span>
+                </div>
+                <div class="stats-element content-shadow content-fill interactive-content">
+                    <h3>Consultas</h3>
+                    <span>3.00K</span>
+                </div>
+            </section>
+        </section>
+        <section class="graph-section">
+            <h2>Gráficos Descriptivos</h2>
+            <section class="graph-content content-shadow">
+                <h3>Terminales por grupo.</h3>
+                <div class="graph content-row">
+                <div class="chart-wrap horizontal">
+                    <div class="grid">
+                        <div class="bar" style="--bar-value:1%; --bar-color:#00b4d8"" data-name="30120" title="1 Terminal"></div>
+                        <div class="bar" style="--bar-value:78%; --bar-color:#023e8a"" data-name="40131" title="401 Terminales"></div>
+                        <div class="bar" style="--bar-value:2%; --bar-color:#48cae4"" data-name="40134" title="4 Terminales"></div>
+                        <div class="bar" style="--bar-value:18%; --bar-color:#0077b6"" data-name="40137" title="101 Terminales"></div>
+                        <div class="bar" style="--bar-value:4%; --bar-color:#90e0ef"" data-name="40140" title="5 Terminales"></div>
+                        <div class="bar" style="--bar-value:1%; --bar-color:#0096c7" data-name="40143" title="1 Terminal"></div>
+                    </div>
+                </div>
+                <div class="chart-info">
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#023e8a"></div>
+                        <span>Grupo 40131: <i>401 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0077b6"></div>
+                        <span>Grupo 40137: <i>101 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0096c7"></div>
+                        <span>Grupo 40143: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#00b4d8"></div>
+                        <span>Grupo 30120: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#48cae4"></div>
+                        <span>Grupo 40134: <i>4 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#90e0ef"></div>
+                        <span>Grupo 40140: <i>5 Terminales</i></span>
+                    </div>
+                </div>
+                </div>
+            </section>
+            <section class="graph-content content-shadow">
+                <h3>Terminales por grupo.</h3>
+                <div class="graph content-row">
+                <div class="chart-wrap horizontal">
+                    <div class="grid">
+                        <div class="bar" style="--bar-value:1%; --bar-color:#00b4d8"" data-name="30120" title="1 Terminal"></div>
+                        <div class="bar" style="--bar-value:78%; --bar-color:#023e8a"" data-name="40131" title="401 Terminales"></div>
+                        <div class="bar" style="--bar-value:2%; --bar-color:#48cae4"" data-name="40134" title="4 Terminales"></div>
+                        <div class="bar" style="--bar-value:18%; --bar-color:#0077b6"" data-name="40137" title="101 Terminales"></div>
+                        <div class="bar" style="--bar-value:4%; --bar-color:#90e0ef"" data-name="40140" title="5 Terminales"></div>
+                        <div class="bar" style="--bar-value:1%; --bar-color:#0096c7" data-name="40143" title="1 Terminal"></div>
+                    </div>
+                </div>
+                <div class="chart-info">
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#023e8a"></div>
+                        <span>Grupo 40131: <i>401 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0077b6"></div>
+                        <span>Grupo 40137: <i>101 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0096c7"></div>
+                        <span>Grupo 40143: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#00b4d8"></div>
+                        <span>Grupo 30120: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#48cae4"></div>
+                        <span>Grupo 40134: <i>4 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#90e0ef"></div>
+                        <span>Grupo 40140: <i>5 Terminales</i></span>
+                    </div>
+                </div>
+                </div>
+            </section>
+            <section class="graph-content content-shadow">
+                <h3>Terminales por grupo.</h3>
+                <div class="graph content-row">
+                <div class="chart-wrap horizontal">
+                    <div class="grid">
+                        <div class="bar" style="--bar-value:1%; --bar-color:#00b4d8"" data-name="30120" title="1 Terminal"></div>
+                        <div class="bar" style="--bar-value:78%; --bar-color:#023e8a"" data-name="40131" title="401 Terminales"></div>
+                        <div class="bar" style="--bar-value:2%; --bar-color:#48cae4"" data-name="40134" title="4 Terminales"></div>
+                        <div class="bar" style="--bar-value:18%; --bar-color:#0077b6"" data-name="40137" title="101 Terminales"></div>
+                        <div class="bar" style="--bar-value:4%; --bar-color:#90e0ef"" data-name="40140" title="5 Terminales"></div>
+                        <div class="bar" style="--bar-value:1%; --bar-color:#0096c7" data-name="40143" title="1 Terminal"></div>
+                    </div>
+                </div>
+                <div class="chart-info">
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#023e8a"></div>
+                        <span>Grupo 40131: <i>401 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0077b6"></div>
+                        <span>Grupo 40137: <i>101 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#0096c7"></div>
+                        <span>Grupo 40143: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#00b4d8"></div>
+                        <span>Grupo 30120: <i>1 Terminal</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#48cae4"></div>
+                        <span>Grupo 40134: <i>4 Terminales</i></span>
+                    </div>
+                    <div class="chart-element">
+                        <div class="box" style="--e-color:#90e0ef"></div>
+                        <span>Grupo 40140: <i>5 Terminales</i></span>
+                    </div>
+                </div>
+                </div>
+            </section>
+        <section class="info-section">
+            <div>
+                <h2>Información de los grupos</h2>
+                <br>
+                <div class="groups-info content-row">
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40131</span>
+                        <h4>Terminales: </h4><span>401</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40137</span>
+                        <h4>Terminales: </h4><span>101</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40143</span>
+                        <h4>Terminales: </h4><span>1</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40131</span>
+                        <h4>Terminales: </h4><span>401</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40137</span>
+                        <h4>Terminales: </h4><span>101</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                    <div class="group-element content-column content-shadow content-fill ">
+                        <h4>Código: </h4><span>40143</span>
+                        <h4>Terminales: </h4><span>1</span>
+                        <h4>Fecha de activación: </h4><span>10/06/2022:10:25:000</span>
+                        <h4>Actualizaciones pendientes: </h4><span>NO</span>
+                        <h4>Fecha de actualización: </h4><span>10/06/2022:10:25:000</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div id="container" class="content-shadow" style="height: 540px; margin-top: 64px; border-radius: 0;"></div>
+    </main>
+    <script>
+        const sum = array => {
+            const i = 0
+            const res = array.reduce( (e, next) => e + next, i )
+            return res
+        }
+
+        anychart.onDocumentReady(function () {
+          anychart.data.loadJsonFile(
+            "https://gist.githubusercontent.com/jeyssson4k/3816660a38de6f57ad2e375077928066/raw/df899a6876bbe8f14cbd07dfbde1e5a752c552e4/test.json",
+            function (data) {
+              let lineChart = anychart.line();
+    
+              lineChart.title("Consumo de CPU");
+              lineChart.xAxis().labels(false).ticks(false).stroke(null);
+              lineChart.crosshair().enabled(true).yStroke(null).yLabel(false);
+              lineChart
+                .legend()
+                .enabled(true)
+                .title("Porcentaje de consumo")
+                .inverted(true);
+    
+              lineChart.line().name("Este mes").data(data.sessions);
+              lineChart.line().name("Mes anterior").data(data.lastMonthSessions);
+              lineChart.line().name("Media").data(data.secondSession);
+              lineChart.tooltip().title("Consumo (%)");
+
+              let sparklineTable = anychart.standalones.table();
+              sparklineTable.contents([
+                [
+                  "Session Metrics",
+                  "30 Days",
+                  "1/09/2022",
+                  null,
+                  "Traffic Metrics",
+                  "30 Days",
+                  "1/09/2022"
+                ],
+                [
+                  "Unique Sessions",
+                  createSparkLine(data.uniqueSessions),
+                  sum(data.uniqueSessions),
+                  null,
+                  "Direct Traffic",
+                  createSparkLine(data.directTraffic),
+                  21
+                ],
+                [
+                  "Page Sessions",
+                  createSparkLine(data.pageSessions),
+                  sum(data.pageSessions),
+                  null,
+                  "Referring Sites",
+                  createSparkLine(data.referringSites),
+                  19
+                ],
+                [
+                  "Page/Session",
+                  createSparkLine(data.pageToSession),
+                  sum(data.pageToSession),
+                  null,
+                  "Search Engines",
+                  createSparkLine(data.searchEngine),
+                  19
+                ],
+                [
+                  "New Sessions",
+                  createSparkLine(data.newSessions),
+                  sum(data.newSessions),
+                  null,
+                  "Goal Metrics",
+                  "30 Days",
+                  "4/10/2015"
+                ],
+                [
+                  "Bounce Rate",
+                  createSparkLine(data.bonusRate),
+                  "27%",
+                  null,
+                  "Goal 1",
+                  createSparkLine(data.goal1),
+                  18
+                ],
+                [
+                  "Avg. Time on Site",
+                  createSparkLine(data.avgTime),
+                  sum(data.avgTime) / 30 + "ms",
+                  null,
+                  "Goal 2",
+                  createSparkLine(data.goal2),
+                  17
+                ]
+              ]);
+
+              sparklineTable
+                .hAlign("center")
+                .vAlign("middle")
+                .fontSize(11)
+                .cellBorder(null);
+    
+              sparklineTable.getCol(0).hAlign("left");
+              sparklineTable.getCol(4).hAlign("left");
+              sparklineTable.getCol(2).width(70);
+              sparklineTable.getCol(6).width(70);
+              sparklineTable.getCol(3).width(30);
+    
+              setupCell(sparklineTable.getRow(0));
+              setupCell(sparklineTable.getCell(4, 4));
+              setupCell(sparklineTable.getCell(4, 5));
+              setupCell(sparklineTable.getCell(4, 6));
+    
+              sparklineTable
+                .getCell(0, 3)
+                .border()
+                .bottom({ color: "#fff", thickness: 1 });
+    
+              let layoutTable = anychart.standalones.table(4, 3);
+    
+              // disable borders for all table cells
+              layoutTable.cellBorder(null);
+    
+              layoutTable.getCol(1).width("90%");
+              layoutTable.getRow(1).height(20);
+              layoutTable.getRow(0).minHeight(200);
+              layoutTable.getRow(2).maxHeight(250);
+              layoutTable.getRow(3).height(20);
+    
+              layoutTable.getCell(0, 1).content(lineChart);
+              layoutTable.getCell(2, 1).content(sparklineTable);
+
+              layoutTable.container("container");
+              layoutTable.draw();
+            }
+          );
+        });
+        function setupCell(cell) {
+          cell.vAlign("bottom");
+          cell.fontColor("#545f69");
+          cell.border().bottom({ color: "#01A1E4", thickness: 1, dash: "0 0 0" });
+        }
+        function createSparkLine(array) {
+          let sparkLine = anychart.sparkline(array);
+          sparkLine.seriesType("area");
+          sparkLine.minMarkers().enabled(true);
+          
+          return sparkLine;
+        }
+    </script>
+</body>
+<footer>
+    <span>Informe automatizado generado el 12/10/2022 12:35:00</span>
+</footer>
+</html>
